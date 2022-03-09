@@ -17,31 +17,37 @@ import { fetchProducts } from "../../store/actions/productAction";
 
 const ProductsOverview = (props) => {
   const [isLoader, setIsLoader] = useState(false);
+  const [isRefresh, setIsrefeshing] = useState(false);
   const [error, setError] = useState();
   const products = useSelector((state) => state.products.availableProducts);
   const dispatch = useDispatch();
 
   const loadProducts = useCallback(async () => {
     setError(null);
-    setIsLoader(true);
+    setIsrefeshing(true);
     try {
       await dispatch(fetchProducts());
     } catch (e) {
-      setIsLoader(false);
       setError(e);
     }
-    setIsLoader(false);
+    setIsrefeshing(false);
   }, [dispatch, setError, setIsLoader]);
 
   useEffect(() => {
-      const willFocusSub =  props.navigation.addListener('willFocus',loadProducts)
-      return()=>{
-         willFocusSub.remove()
-      }
+    const willFocusSub = props.navigation.addListener(
+      "willFocus",
+      loadProducts
+    );
+    return () => {
+      willFocusSub.remove();
+    };
   }, [loadProducts]);
 
   useEffect(() => {
-    loadProducts();
+    setIsLoader(true);
+    loadProducts().then(() => {
+      setIsLoader(false);
+    });
   }, [dispatch]);
 
   const selectItemHandler = (id, title) => {
@@ -79,6 +85,8 @@ const ProductsOverview = (props) => {
 
   return (
     <FlatList
+    onRefresh={loadProducts}
+    refreshControl={isRefresh}
       data={products}
       renderItem={(itemData) => (
         <ProductItem

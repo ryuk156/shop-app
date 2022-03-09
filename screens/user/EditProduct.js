@@ -25,7 +25,6 @@ const EditProduct = (props) => {
   const [isLoader, setIsLoader] = useState(false);
   const [error, setError] = useState();
   const prodId = props.navigation.getParam("productid");
-  const dispatch = useDispatch();
   console.log(prodId);
 
   const editedProduct = useSelector(
@@ -43,47 +42,59 @@ const EditProduct = (props) => {
     editedProduct ? editedProduct.description : ""
   );
 
+  const dispatch = useDispatch();
 
-  const submitHandler = useCallback(() => {
-    if (editedProduct) {
-      dispatch(updateProduct(prodId, title, desc, imageUrl));
-      props.navigation.goBack();
-    } else {
-     dispatch(createProduct(title, desc, imageUrl, +price));
-      props.navigation.goBack();
+  useEffect(()=>{
+    if(error){
+      Alert.alert(
+        "Error",
+        "please try again!!",[
+        { text: "OK", style: "default" },
+        ]
+      );
     }
-    // try {
-    //   setError(null);
-    //   setIsLoader(true);
-     
-    // } catch (e) {
-    //   setError(e);
-    //   setIsLoader(false);
-    // }
-  }, [dispatch, prodId, title, desc, imageUrl, price]);
+  },[error])
+
+  const submitHandler = useCallback(async () => {
+    try {
+      setError(null);
+      setIsLoader(true);
+      if (editedProduct) {
+        await dispatch(updateProduct(prodId, title, desc, imageUrl));
+        
+      } else {
+        await dispatch(createProduct(title, desc, imageUrl, +price));
+      }
+      props.navigation.goBack();
+    } catch (e) {
+      setError(e.message);
+    }
+    setIsLoader(false);
+   
+  }, [dispatch, prodId, title, desc, imageUrl, price,setError, setIsLoader]);
 
   useEffect(() => {
     props.navigation.setParams({ submit: submitHandler });
   }, [submitHandler]);
 
-  // if (error) {
-  //   return (
-  //     <View style={styles.center}>
-  //       <Text>Something went wrong, please try again</Text>
-  //       <View style={{ marginTop: 8 }}>
-  //         <Button color={Colors.primary} title="Retry" onPress={loadProducts} />
-  //       </View>
-  //     </View>
-  //   );
-  // }
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text>Something went wrong, please try again</Text>
+        <View style={{ marginTop: 8 }}>
+          <Button color={Colors.primary} title="Retry" onPress={loadProducts} />
+        </View>
+      </View>
+    );
+  }
 
-  // if (isLoader) {
-  //   return (
-  //     <View style={styles.center}>
-  //       <ActivityIndicator size="large" color={Colors.primary} />
-  //     </View>
-  //   );
-  // }
+  if (isLoader) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <ScrollView>
