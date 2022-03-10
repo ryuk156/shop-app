@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, ActivityIndicator, StyleSheet } from "react-native";
 
 import { useSelector, useDispatch } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
@@ -10,28 +10,28 @@ import { fetchOrders } from "../../store/actions/orderAction";
 const OrderScreen = (props) => {
   const [isLoader, setIsLoader] = useState(false);
   const [isRefresh, setIsrefeshing] = useState(false);
-  consr[(error, setError)] = useState();
+  const [error, setError] = useState();
   const order = useSelector((state) => state.order.order);
   const dispatch = useDispatch();
 
   const loadOrder = useCallback(async () => {
+    setError(null)
+    setIsrefeshing(true)
     try {
-      setError(null)
-      setIsrefeshing(true)
       await dispatch(fetchOrders());
     } catch (e) {
       setError(e);
     }
     setIsrefeshing(false)
-  }, [dispatch, setIsLoader]);
+  }, [dispatch,setIsrefeshing ]);
   
   useEffect(() => {
     setIsLoader(true);
-    loadOrder().then(()=>{
-      setIsLoader(false);
-    });
+    loadOrder().then(
+      setIsLoader(false)
+    );
     
-  }, [dispatch]);
+  }, [dispatch,setIsLoader]);
 
   if (error) {
     return (
@@ -62,7 +62,7 @@ const OrderScreen = (props) => {
   return (
     <FlatList
     onRefresh={loadOrder}
-    refreshControl={isRefresh}
+   refreshing={isRefresh}
       data={order}
       renderItem={(itemData) => (
         <OrderItem

@@ -18,6 +18,7 @@ export default (state = initialState, action) => {
         action.orderData.amount,
         action.orderData.date,
       );
+      console.log(newOrder)
       return{
           ...state,
           order:state.order.concat(newOrder)

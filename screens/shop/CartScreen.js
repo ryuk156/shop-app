@@ -1,5 +1,13 @@
-import React from "react";
-import { Text, View, Button, Image, StyleSheet, FlatList } from "react-native";
+import React, { useState } from "react";
+import {
+  Text,
+  View,
+  Button,
+  Image,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 
 import { useSelector, useDispatch } from "react-redux";
 import Colors from "../../constants/Colors";
@@ -8,6 +16,8 @@ import { removeFromCart } from "../../store/actions/cartAction";
 import { addOrder } from "../../store/actions/orderAction";
 
 const CartScreen = (props) => {
+  const dispatch = useDispatch();
+  const [isLoader, setIsLoader] = useState(false);
   const getCartTotal = useSelector((state) => state.cart.totalAmount);
   const getCartItem = useSelector((state) => {
     let transformedCartItems = [];
@@ -24,7 +34,13 @@ const CartScreen = (props) => {
       a.productId > b.productId ? 1 : -1
     );
   });
-  const dispatch = useDispatch();
+
+  const handleAddOrder = async () => {
+    setIsLoader(true);
+    await dispatch(addOrder(getCartItem, getCartTotal));
+    setIsLoader(false);
+  };
+
   return (
     <View style={styles.screen}>
       <View style={styles.summary}>
@@ -32,14 +48,18 @@ const CartScreen = (props) => {
           Total: <Text style={styles.amount}>${getCartTotal.toFixed(2)}</Text>
         </Text>
         <View style={styles.Button}>
-          <Button
-            title="Order Now"
-            color={Colors.accent}
-            disabled={getCartItem.length === 0}
-            onPress={() => {
-              dispatch(addOrder(getCartItem, getCartTotal));
-            }}
-          />
+          {isLoader ? (
+              <View style={styles.center}>
+              <ActivityIndicator size="large" color={Colors.primary} />
+            </View>
+          ) : (
+            <Button
+              title="Order Now"
+              color={Colors.accent}
+              disabled={getCartItem.length === 0}
+              onPress={handleAddOrder}
+            />
+          )}
         </View>
       </View>
       <View style={styles.heading}>
@@ -95,6 +115,11 @@ const styles = StyleSheet.create({
   },
   heading: {
     marginLeft: 5,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

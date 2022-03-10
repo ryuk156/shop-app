@@ -31,7 +31,7 @@ const ProductsOverview = (props) => {
       setError(e);
     }
     setIsrefeshing(false);
-  }, [dispatch, setError, setIsLoader]);
+  }, [dispatch, setError, setIsrefeshing]);
 
   useEffect(() => {
     const willFocusSub = props.navigation.addListener(
@@ -45,10 +45,10 @@ const ProductsOverview = (props) => {
 
   useEffect(() => {
     setIsLoader(true);
-    loadProducts().then(() => {
-      setIsLoader(false);
-    });
-  }, [dispatch]);
+    loadProducts().then(
+      setIsLoader(false)
+    );
+  }, [dispatch,setIsLoader]);
 
   const selectItemHandler = (id, title) => {
     props.navigation.navigate("ProductDetail", {
@@ -86,7 +86,8 @@ const ProductsOverview = (props) => {
   return (
     <FlatList
     onRefresh={loadProducts}
-    refreshControl={isRefresh}
+    refreshing={isRefresh}
+    
       data={products}
       renderItem={(itemData) => (
         <ProductItem
