@@ -1,6 +1,6 @@
 import  React from  'react'
 import { Platform } from "react-native";
-import { createAppContainer } from "react-navigation";
+import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator} from "react-navigation-stack";
 import { createDrawerNavigator } from "react-navigation-drawer";
 
@@ -13,6 +13,7 @@ import CartScreen from "../screens/shop/CartScreen";
 import OrderScreen from "../screens/shop/OrderScreen";
 import UserProduct from '../screens/user/UserProduct';
 import EditProduct from '../screens/user/EditProduct';
+import AuthScreen from '../screens/user/AuthScreen';
 import { Ionicons } from "@expo/vector-icons";
 
 
@@ -62,7 +63,7 @@ const  AdminNavigator  = createStackNavigator({
 },{
 
     navigationOptions: {
-        drawerIcon: drawerConfig =><Ionicons name="md-people" size={23} color={drawerConfig.tintColor} />
+        drawerIcon: drawerConfig =><Ionicons name="ios-people" size={23} color={drawerConfig.tintColor} />
     },
     defaultNavigationOptions: defaultOptions
 }
@@ -84,4 +85,18 @@ const  ShopNavigator = createDrawerNavigator({
 },)
 
 
-export default createAppContainer(ShopNavigator)
+const AuthNavigator = createStackNavigator({
+    Auth: AuthScreen
+},{
+    // defaultNavigationOptions: defaultOptions
+}
+)
+
+const  MainNavigator = createSwitchNavigator({
+    Auth: AuthNavigator,
+    Shop: ShopNavigator
+})
+
+
+
+export default createAppContainer(MainNavigator)
